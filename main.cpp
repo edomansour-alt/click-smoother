@@ -1,3 +1,4 @@
+
 #include <Geode/Geode.hpp>
 #include <Geode/modify/GJBaseGameLayer.hpp>
 #include <deque>
@@ -21,10 +22,13 @@ class $modify(SmootherLayer, GJBaseGameLayer) {
     int currentMode() {
         auto mod = Mod::get();
         if (!mod->getSettingValue<bool>("enabled") || !m_player1) return 0;
+
         if (m_player1->m_isDart)
             return mod->getSettingValue<bool>("wave-enabled") ? 1 : 0;
+
         if (m_player1->m_isShip)
             return mod->getSettingValue<bool>("ship-enabled") ? 2 : 0;
+
         return 0;
     }
 
@@ -37,6 +41,7 @@ class $modify(SmootherLayer, GJBaseGameLayer) {
     double avgInterval() {
         auto f = m_fields.self();
         if (f->intervals.empty()) return 0.0;
+
         return std::accumulate(f->intervals.begin(), f->intervals.end(), 0.0)
             / static_cast<double>(f->intervals.size());
     }
@@ -58,9 +63,11 @@ class $modify(SmootherLayer, GJBaseGameLayer) {
 
         if (f->lastPress >= 0.0) {
             double gap = f->now - f->lastPress;
+
             if (gap <= window) {
                 f->intervals.push_back(gap);
-                if (f->intervals.size() > 6) f->intervals.pop_front();
+                if (f->intervals.size() > 6)
+                    f->intervals.pop_front();
             } else {
                 f->intervals.clear();
             }
@@ -77,19 +84,23 @@ class $modify(SmootherLayer, GJBaseGameLayer) {
 
     void handleButton(bool down, int button, bool isPlayer1) {
         auto f = m_fields.self();
+
         if (!f->synthetic && button == 1 && isPlayer1) {
             if (down) {
                 f->realHeld = true;
                 int mode = currentMode();
+
                 if (mode != f->mode) {
                     resetRhythm();
                     f->mode = mode;
                 }
+
                 if (mode != 0) recordPress(true, mode);
             } else {
                 f->realHeld = false;
             }
         }
+
         GJBaseGameLayer::handleButton(down, button, isPlayer1);
     }
 
@@ -100,10 +111,12 @@ class $modify(SmootherLayer, GJBaseGameLayer) {
         f->now += dt;
 
         int mode = currentMode();
+
         if (mode != f->mode) {
             resetRhythm();
             f->mode = mode;
         }
+
         if (mode == 0) return;
 
         if (f->releaseAt >= 0.0 && f->now >= f->releaseAt) {
@@ -139,6 +152,7 @@ $on_game(Loaded) {
         "open-menu",
         [](Keybind const&, bool down, bool repeat, double) {
             if (down && !repeat) {
+                log::info("Click Smoother keybind detected!");
                 geode::openSettingsPopup(Mod::get());
             }
         }
