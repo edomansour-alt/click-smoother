@@ -14,27 +14,24 @@ class $modify(SmootherLayer, GJBaseGameLayer) {
         bool synthetic = false;
         bool realHeld = false;
         int consecutiveFills = 0;
-        int mode = 0; // 0 = other, 1 = wave, 2 = ship
+        int mode = 0;
         std::deque<double> intervals;
     };
 
-    // returns 1 for wave, 2 for ship, 0 for anything else (or disabled)
     int currentMode() {
         auto mod = Mod::get();
         if (!mod->getSettingValue<bool>("enabled") || !m_player1) return 0;
-        if (m_player1->m_isDart) {
+        if (m_player1->m_isDart)
             return mod->getSettingValue<bool>("wave-enabled") ? 1 : 0;
-        }
-        if (m_player1->m_isShip) {
+        if (m_player1->m_isShip)
             return mod->getSettingValue<bool>("ship-enabled") ? 2 : 0;
-        }
         return 0;
     }
 
     double modeMinCps(int mode) {
         auto mod = Mod::get();
-        if (mode == 1) return mod->getSettingValue<double>("wave-cps"); // default 9
-        return mod->getSettingValue<double>("ship-cps");                // default 6
+        if (mode == 1) return mod->getSettingValue<double>("wave-cps");
+        return mod->getSettingValue<double>("ship-cps");
     }
 
     double avgInterval() {
@@ -68,14 +65,14 @@ class $modify(SmootherLayer, GJBaseGameLayer) {
                 f->intervals.clear();
             }
         }
+
         f->lastPress = f->now;
         if (real) f->consecutiveFills = 0;
 
-        if (f->intervals.size() >= 4 && avgInterval() <= 1.0 / minCps) {
+        if (f->intervals.size() >= 4 && avgInterval() <= 1.0 / minCps)
             f->nextFill = f->now + avgInterval() * tol;
-        } else {
+        else
             f->nextFill = -1.0;
-        }
     }
 
     void handleButton(bool down, int button, bool isPlayer1) {
@@ -117,11 +114,15 @@ class $modify(SmootherLayer, GJBaseGameLayer) {
         }
 
         if (f->nextFill >= 0.0 && f->now >= f->nextFill) {
-            int maxFills = static_cast<int>(Mod::get()->getSettingValue<int64_t>("max-fills"));
+            int maxFills = static_cast<int>(
+                Mod::get()->getSettingValue<int64_t>("max-fills")
+            );
+
             if (!f->realHeld && f->consecutiveFills < maxFills) {
                 f->synthetic = true;
                 GJBaseGameLayer::handleButton(true, 1, true);
                 f->synthetic = false;
+
                 f->releaseAt = f->now + 0.02;
                 f->consecutiveFills++;
                 f->lastPress = f->now;
@@ -132,20 +133,11 @@ class $modify(SmootherLayer, GJBaseGameLayer) {
         }
     }
 };
+
 $on_game(Loaded) {
     listenForKeybindSettingPresses(
         "open-menu",
-        [](Keybind const& keybind, bool down, bool repeat, double timestamp) {
-            if (down && !repeat) {
-                geode::openSettingsPopup(Mod::get());
-            }
-        }
-    );
-}
-$on_game(Loaded) {
-    listenForKeybindSettingPresses(
-        "open-menu",
-        [](Keybind const& keybind, bool down, bool repeat, double timestamp) {
+        [](Keybind const&, bool down, bool repeat, double) {
             if (down && !repeat) {
                 geode::openSettingsPopup(Mod::get());
             }
