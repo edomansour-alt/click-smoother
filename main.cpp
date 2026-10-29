@@ -142,3 +142,13 @@ $on_game(Loaded) {
         }
     );
 }
+$on_game(Loaded) {
+    listenForKeybindSettingPresses(
+        "open-menu",
+        [](Keybind const& keybind, bool down, bool repeat, double timestamp) {
+            if (down && !repeat) {
+                geode::openSettingsPopup(Mod::get());
+            }
+        }
+    );
+}
