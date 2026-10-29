@@ -57,3 +57,10 @@
     }
   }
 }
+"open-menu": {
+  "type": "keybind",
+  "name": "Open Click Smoother Menu",
+  "description": "Press Delete to open the settings menu.",
+  "default": "Delete",
+  "category": "universal"
+}
