@@ -1,3 +1,4 @@
+```json
 {
   "geode": "5.11.2",
   "gd": {
@@ -54,13 +55,13 @@
       "default": 1,
       "min": 1,
       "max": 5
+    },
+    "open-menu": {
+      "type": "keybind",
+      "name": "Open Click Smoother Menu",
+      "description": "Press Delete to open the settings menu.",
+      "default": "Delete",
+      "category": "universal"
     }
   }
-}
-"open-menu": {
-  "type": "keybind",
-  "name": "Open Click Smoother Menu",
-  "description": "Press Delete to open the settings menu.",
-  "default": "Delete",
-  "category": "universal"
 }
